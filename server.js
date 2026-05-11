@@ -12,11 +12,23 @@ const PORT = process.env.PORT || 5000;
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (curl, Postman) or any localhost port
-    if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      return callback(null, true);
+    // Allow requests with no origin (curl, Postman)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
+      /^https?:\/\/((www\.)?imtechguru\.in)$/,
+      /\.vercel\.app$/,
+      /\.railway\.app$/
+    ];
+
+    const isAllowed = allowedOrigins.some(regex => regex.test(origin));
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
