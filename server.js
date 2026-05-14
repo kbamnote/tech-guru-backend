@@ -18,7 +18,7 @@ app.use(cors({
 
     const allowedOrigins = [
       /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
-      /^https?:\/\/((www\.)?imtechguru\.in)$/,
+      /^https?:\/\/((www\.|admin\.)?imtechguru\.in)$/,
       /\.vercel\.app$/,
       /\.railway\.app$/
     ];
