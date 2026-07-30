@@ -7,7 +7,8 @@ const productSchema = new mongoose.Schema({
   originalPrice: { type: Number, min: 0 },
   rating:      { type: Number, default: 4.5, min: 0, max: 5 },
   reviews:     { type: Number, default: 0, min: 0 },
-  image:       { type: String, default: '' },                 // Cloudinary URL
+  image:       { type: String, default: '' },                 // Primary/thumbnail Cloudinary URL
+  images:      { type: [String], default: [] },               // Gallery; images[0] is kept in sync with `image`
   badge:       { type: String, default: '' },
   description: { type: String, default: '' },
   features:    { type: [String], default: [] },

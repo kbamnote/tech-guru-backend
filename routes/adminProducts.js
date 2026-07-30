@@ -8,6 +8,23 @@ const multer = require('multer');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
 
+/**
+ * Keeps `image` (primary/thumbnail, used by listings, cart and related products)
+ * consistent with `images` (the detail-page gallery).
+ *  - gallery given      → primary becomes images[0]
+ *  - only `image` given  → gallery seeded from it, so old products still work
+ * Mutates and returns the payload.
+ */
+function syncImageFields(payload) {
+  if (Array.isArray(payload.images)) {
+    payload.images = payload.images.filter(Boolean);
+    payload.image = payload.images[0] || '';
+  } else if (payload.image) {
+    payload.images = [payload.image];
+  }
+  return payload;
+}
+
 // ─── All routes below require authentication ─────────────────────────
 router.use(authMiddleware);
 
@@ -41,7 +58,7 @@ router.get('/products/:id', async (req, res) => {
 // POST /api/admin/products — create product
 router.post('/products', async (req, res) => {
   try {
-    const { title, category, price, originalPrice, rating, reviews, image, badge, description, features, driveLink, active, sortOrder } = req.body;
+    const { title, category, price, originalPrice, rating, reviews, image, images, badge, description, features, driveLink, active, sortOrder } = syncImageFields({ ...req.body });
 
     if (!title || !category || price === undefined) {
       return res.status(400).json({ success: false, message: 'title, category, and price are required.' });
@@ -53,6 +70,7 @@ router.post('/products', async (req, res) => {
       rating: rating || 4.5,
       reviews: reviews || 0,
       image: image || '',
+      images: images || [],
       badge: badge || '',
       description: description || '',
       features: features || [],
@@ -72,7 +90,7 @@ router.post('/products', async (req, res) => {
 // PUT /api/admin/products/:id — update product
 router.put('/products/:id', async (req, res) => {
   try {
-    const updates = req.body;
+    const updates = syncImageFields({ ...req.body });
     const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found.' });
     res.json({ success: true, product });
