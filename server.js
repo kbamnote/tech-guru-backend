@@ -5,7 +5,10 @@ const cors = require('cors');
 
 const ordersRouter = require('./routes/orders');
 const adminRouter = require('./routes/admin');
+const adminProductsRouter = require('./routes/adminProducts');
 const paymentRouter = require('./routes/paymentRoutes');
+const publicProductsRouter = require('./routes/publicProducts');
+const publicCategoriesRouter = require('./routes/publicCategories');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,7 +43,10 @@ app.use(express.json());
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/orders', ordersRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/admin', adminProductsRouter);
 app.use('/api/payments', paymentRouter);
+app.use('/api/products', publicProductsRouter);
+app.use('/api/categories', publicCategoriesRouter);
 
 // Health check
 app.get('/', (req, res) => {
